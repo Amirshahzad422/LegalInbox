@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 const CATEGORIES = [
   "new_inquiry",
@@ -76,11 +77,22 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as {
       subject?: unknown;
       body?: unknown;
+      email_id?: unknown;
     };
 
     if (typeof payload.subject !== "string" || typeof payload.body !== "string") {
       return NextResponse.json(
         { error: "Request body must include subject and body strings" },
+        { status: 400 },
+      );
+    }
+
+    if (
+      payload.email_id !== undefined &&
+      typeof payload.email_id !== "string"
+    ) {
+      return NextResponse.json(
+        { error: "email_id must be a string when provided" },
         { status: 400 },
       );
     }
@@ -102,6 +114,29 @@ export async function POST(request: Request) {
     }
 
     const result = parseClassification(text);
+
+    if (payload.email_id) {
+      const { data, error } = await supabase
+        .from("emails")
+        .update({
+          category: result.category,
+          urgency_score: result.urgency_score,
+        })
+        .eq("id", payload.email_id)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data) {
+        throw new Error(`No email found with id ${payload.email_id}`);
+      }
+
+      return NextResponse.json(data);
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     const message =
