@@ -5,10 +5,12 @@ import { EMAIL_CATEGORIES } from "@/lib/types";
 import type { EmailCategory, Template } from "@/lib/types";
 
 export default function TemplateManager({
-  initialTemplates,
-}: {
-  initialTemplates: Template[];
-}) {
+    initialTemplates,
+    editCounts,
+  }: {
+    initialTemplates: Template[];
+    editCounts: Record<string, number>;
+  }) {
   const [templates, setTemplates] = useState(initialTemplates);
   const [newCategory, setNewCategory] = useState<EmailCategory>(
     EMAIL_CATEGORIES[0],
@@ -142,12 +144,17 @@ export default function TemplateManager({
             className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950"
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                {template.category.replace("_", " ")}{" "}
-                <span className="font-normal text-zinc-400">
-                  v{template.version}
-                </span>
-              </span>
+            <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+  {template.category.replace("_", " ")}{" "}
+  <span className="font-normal text-zinc-400">
+    v{template.version}
+  </span>
+  {(editCounts[template.id] ?? 0) >= 3 && (
+    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+      Suggested update needed
+    </span>
+  )}
+</span>
               <label className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                 <input
                   type="checkbox"

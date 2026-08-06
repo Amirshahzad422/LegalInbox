@@ -80,3 +80,19 @@ export async function toggleAutoSend(
     throw new Error(error.message);
   }
 }
+
+export async function fetchEditCountsByTemplate(): Promise<Record<string, number>> {
+    const { data, error } = await supabase
+      .from("template_edits")
+      .select("template_id");
+  
+    if (error) throw new Error(error.message);
+  
+    const counts: Record<string, number> = {};
+    for (const row of data ?? []) {
+      if (row.template_id) {
+        counts[row.template_id] = (counts[row.template_id] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }
