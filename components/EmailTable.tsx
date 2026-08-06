@@ -1,3 +1,4 @@
+import GenerateDraftButton from "@/components/GenerateDraftButton";
 import CategoryBadge from "@/components/CategoryBadge";
 import StatusBadge from "@/components/StatusBadge";
 import UrgencyBar from "@/components/UrgencyBar";
@@ -35,6 +36,7 @@ export default function EmailTable({
               {!compact && <th className="px-4 py-3">Status</th>}
               {!compact && <th className="px-4 py-3">Matter</th>}
               <th className="px-4 py-3">Received</th>
+              {!compact && <th className="px-4 py-3">Draft</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 bg-white dark:divide-zinc-800 dark:bg-black">
@@ -75,6 +77,11 @@ export default function EmailTable({
                 <td className="whitespace-nowrap px-4 py-3 text-zinc-500 dark:text-zinc-400">
                   {formatRelativeTime(email.created_at)}
                 </td>
+                {!compact && (
+  <td className="px-4 py-3">
+    <GenerateDraftButton emailId={email.id} />
+  </td>
+)}
               </tr>
             ))}
           </tbody>
