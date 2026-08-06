@@ -114,3 +114,15 @@ export async function fetchPriorityEmails(
 
   return (data ?? []).map((row) => normalizeEmail(row as SupabaseEmailRow));
 }
+
+export async function assignStaffToEmail(
+  emailId: string,
+  staffId: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from("emails")
+    .update({ assigned_staff_id: staffId })
+    .eq("id", emailId);
+
+  if (error) throw new Error(error.message);
+}

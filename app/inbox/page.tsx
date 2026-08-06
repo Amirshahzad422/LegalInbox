@@ -1,12 +1,13 @@
 import ConnectGmailButton from "@/components/ConnectGmailButton";
 import EmailTable from "@/components/EmailTable";
 import { fetchEmails } from "@/lib/emails";
+import { fetchStaff } from "@/lib/staff";
 
 export const dynamic = "force-dynamic";
 
 export default async function InboxPage() {
   try {
-    const emails = await fetchEmails();
+    const [emails, staff] = await Promise.all([fetchEmails(), fetchStaff()]);
     const needsReply = emails.filter((e) => e.status === "needs_reply").length;
 
     return (
@@ -23,7 +24,7 @@ export default async function InboxPage() {
           </p>
         </div>
 
-        <EmailTable emails={emails} />
+        <EmailTable emails={emails} staffOptions={staff} />
       </div>
     );
   } catch (error) {

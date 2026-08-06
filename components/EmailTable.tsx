@@ -5,13 +5,16 @@ import UrgencyBar from "@/components/UrgencyBar";
 import { formatRelativeTime, truncate } from "@/lib/format";
 import { EMAIL_CATEGORIES } from "@/lib/types";
 import type { EmailCategory, EmailWithRelations } from "@/lib/types";
+import AssignStaffDropdown from "@/components/AssignStaffDropdown";
 
 export default function EmailTable({
   emails,
   compact = false,
+  staffOptions = [],
 }: {
   emails: EmailWithRelations[];
   compact?: boolean;
+  staffOptions?: { id: string; name: string }[];
 }) {
   if (emails.length === 0) {
     return (
@@ -35,6 +38,7 @@ export default function EmailTable({
               <th className="px-4 py-3">Category</th>
               {!compact && <th className="px-4 py-3">Status</th>}
               {!compact && <th className="px-4 py-3">Matter</th>}
+              {!compact && <th className="px-4 py-3">Assigned</th>}
               <th className="px-4 py-3">Received</th>
               {!compact && <th className="px-4 py-3">Draft</th>}
             </tr>
@@ -73,7 +77,17 @@ export default function EmailTable({
                   <td className="max-w-[10rem] truncate px-4 py-3 text-zinc-600 dark:text-zinc-400">
                     {email.matters?.name ?? "—"}
                   </td>
+
                 )}
+                {!compact && (
+  <td className="px-4 py-3">
+    <AssignStaffDropdown
+      emailId={email.id}
+      currentStaffId={email.assigned_staff_id}
+      staffOptions={staffOptions}
+    />
+  </td>
+)}
                 <td className="whitespace-nowrap px-4 py-3 text-zinc-500 dark:text-zinc-400">
                   {formatRelativeTime(email.created_at)}
                 </td>
