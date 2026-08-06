@@ -1,11 +1,14 @@
 import TemplateManager from "@/components/TemplateManager";
-import { fetchTemplates } from "@/lib/templates";
+import { fetchTemplates, fetchEditCountsByTemplate } from "@/lib/templates";
 
 export const dynamic = "force-dynamic";
 
 export default async function TemplatesPage() {
   try {
-    const templates = await fetchTemplates();
+    const [templates, editCounts] = await Promise.all([
+      fetchTemplates(),
+      fetchEditCountsByTemplate(),
+    ]);
 
     return (
       <div className="p-8">
@@ -15,7 +18,7 @@ export default async function TemplatesPage() {
         <p className="mt-1 mb-8 text-sm text-zinc-500 dark:text-zinc-400">
           Manage reply templates by category, versioned automatically on edit.
         </p>
-        <TemplateManager initialTemplates={templates} />
+        <TemplateManager initialTemplates={templates} editCounts={editCounts} />
       </div>
     );
   } catch (error) {
