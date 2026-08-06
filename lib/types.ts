@@ -75,3 +75,23 @@ export type GmailSyncResult = {
   classified: number;
   errors: string[];
 };
+
+export type Template = {
+  id: string;
+  category: EmailCategory;
+  body: string;
+  version: number;
+  auto_send_enabled: boolean;
+  confidence_threshold: number;
+  updated_at: string;
+  created_at: string;
+};
+
+export type Staff = {
+  id: string;
+  auth_user_id: string | null;
+  name: string;
+  email: string;
+  voice_profile: string | null;
+  created_at: string;
+};
