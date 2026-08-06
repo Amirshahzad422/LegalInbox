@@ -1,5 +1,5 @@
 import ConnectGmailButton from "@/components/ConnectGmailButton";
-import EmailTable from "@/components/EmailTable";
+import InboxWithFilters from "@/components/InboxWithFilters";
 import { fetchEmails } from "@/lib/emails";
 import { fetchStaff } from "@/lib/staff";
 
@@ -24,7 +24,7 @@ export default async function InboxPage() {
           </p>
         </div>
 
-        <EmailTable emails={emails} staffOptions={staff} />
+        <InboxWithFilters emails={emails} staffOptions={staff} />
       </div>
     );
   } catch (error) {
