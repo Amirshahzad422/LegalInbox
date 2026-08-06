@@ -5,7 +5,6 @@ import { useState } from "react";
 export default function ClassifyTestPage() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
-  const [emailId, setEmailId] = useState("");
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -18,11 +17,7 @@ export default function ClassifyTestPage() {
       const res = await fetch("/api/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          subject,
-          body,
-          ...(emailId ? { email_id: emailId } : {}),
-        }),
+        body: JSON.stringify({ subject, body }),
       });
 
       const data = await res.json();
@@ -77,22 +72,6 @@ export default function ClassifyTestPage() {
             rows={8}
             className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
             placeholder="Email body"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="emailId"
-            className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-          >
-            Email ID <span className="text-zinc-400">(optional — updates a real Supabase row if provided)</span>
-          </label>
-          <input
-            id="emailId"
-            value={emailId}
-            onChange={(event) => setEmailId(event.target.value)}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
-            placeholder="Paste a real email UUID from Supabase here"
           />
         </div>
 
