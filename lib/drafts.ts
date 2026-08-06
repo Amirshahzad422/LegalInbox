@@ -142,3 +142,105 @@ export async function generateDraft(emailId: string): Promise<Draft> {
 
   return draft;
 }
+export type DraftWithEmail = Draft & {
+    emails: {
+      id: string;
+      sender: string;
+      subject: string | null;
+      body: string | null;
+      category: string | null;
+    } | null;
+  };
+  
+  export async function fetchPendingDrafts(): Promise<DraftWithEmail[]> {
+    const { data, error } = await supabase
+      .from("drafts")
+      .select(
+        `
+        id,
+        email_id,
+        template_id,
+        generated_text,
+        confidence_score,
+        auto_send_eligible,
+        status,
+        created_at,
+        emails ( id, sender, subject, body, category )
+      `,
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+  
+    if (error) throw new Error(error.message);
+  
+    return (data ?? []).map((row: any) => ({
+      ...row,
+      emails: Array.isArray(row.emails) ? row.emails[0] ?? null : row.emails,
+    }));
+  }
+  
+  export async function approveDraft(draftId: string): Promise<void> {
+    const { data: draft, error: fetchError } = await supabase
+      .from("drafts")
+      .select("email_id")
+      .eq("id", draftId)
+      .single();
+  
+    if (fetchError) throw new Error(fetchError.message);
+  
+    const { error } = await supabase
+      .from("drafts")
+      .update({ status: "sent" })
+      .eq("id", draftId);
+  
+    if (error) throw new Error(error.message);
+  
+    await supabase
+      .from("emails")
+      .update({ status: "replied" })
+      .eq("id", draft.email_id);
+  }
+  
+  export async function discardDraft(draftId: string): Promise<void> {
+    const { error } = await supabase
+      .from("drafts")
+      .update({ status: "discarded" })
+      .eq("id", draftId);
+  
+    if (error) throw new Error(error.message);
+  }
+  
+  export async function editAndApproveDraft(
+    draftId: string,
+    editedText: string,
+  ): Promise<void> {
+    const { data: draft, error: fetchError } = await supabase
+      .from("drafts")
+      .select("*")
+      .eq("id", draftId)
+      .single();
+  
+    if (fetchError) throw new Error(fetchError.message);
+  
+    // Log the edit for the learning loop (template_edits table)
+    if (draft.template_id) {
+      await supabase.from("template_edits").insert({
+        draft_id: draftId,
+        template_id: draft.template_id,
+        original_text: draft.generated_text,
+        edited_text: editedText,
+      });
+    }
+  
+    const { error: updateError } = await supabase
+      .from("drafts")
+      .update({ status: "sent", generated_text: editedText })
+      .eq("id", draftId);
+  
+    if (updateError) throw new Error(updateError.message);
+  
+    await supabase
+      .from("emails")
+      .update({ status: "replied" })
+      .eq("id", draft.email_id);
+  }
