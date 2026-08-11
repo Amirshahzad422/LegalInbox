@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/", label: "Dashboard" },
@@ -31,10 +32,11 @@ export default function SidebarLayout({
   return (
     <div className="flex min-h-full">
       <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="border-b border-zinc-200 px-6 py-5 dark:border-zinc-800">
-          <p className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            LegalInbox
-          </p>
+        <div className="flex items-center justify-between border-b border-zinc-200 px-6 py-5 dark:border-zinc-800">
+            <p className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                LegalInbox
+            </p>
+            <ThemeToggle />
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-4">
           {navItems.map(({ href, label }) => {
